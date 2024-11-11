@@ -92,7 +92,7 @@ public class Ummuhan extends DataBaseHelper {
         }
     }
 
-    public void soru27(){
+    public void soru27(){ //TODO : Veri farklı
         List<List<String>> data =getData("select * from employees \n" +
                 "left join dept_emp on dept_emp.emp_no=employees.emp_no\n" +
                 "left join dept_manager on dept_emp.dept_no=dept_manager.dept_no\n" +
@@ -112,7 +112,7 @@ public class Ummuhan extends DataBaseHelper {
         }
     }
 
-    public void soru29(){ //TODO : Veri farklı
+    public void soru29(){
         List<List<String>> data =getData("select employees.*, departments.dept_name, titles.title\n" +
                 "from employees\n" +
                 "left join  dept_emp on employees.emp_no=dept_emp.emp_no \n" +
