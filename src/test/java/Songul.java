@@ -3,10 +3,7 @@ import utilities.DataBaseHelper;
 import java.util.List;
 public class Songul extends DataBaseHelper {
     public static void main(String[] args) {
-        List<List<String>> data =getData("select *  from employees order by birth_date limit 100;");
-        for (List<String> row : data){
-            System.out.println(row);
-        }
+
     }
     public void Soru31(){
         List<List<String>> data =getData("select employees.emp_no,employees.first_name,employees.last_name,max(salaries.salary)\n" +
