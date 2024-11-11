@@ -5,7 +5,6 @@ import java.util.List;
 public class Ummuhan extends DataBaseHelper {
 
     public static void main(String[] args) {
-
     }
 
     public void soru21a(){
@@ -62,10 +61,10 @@ public class Ummuhan extends DataBaseHelper {
         }
     }
 
-    public void soru24(){ //TODO : Veri farklı
+    public void soru24(){
         List<List<String>> data =getData("select employees.first_name, employees.last_name, employees.hire_date\n" +
                 "from employees\n" +
-                "where employees.hire_date between '1990-02-20' and '1995-02-20';");
+                "where employees.hire_date between '1990-02-20' and '1995-02-20' limit 100;");
         for (List<String> row : data){
             System.out.println(row);
         }
@@ -92,11 +91,11 @@ public class Ummuhan extends DataBaseHelper {
         }
     }
 
-    public void soru27(){ //TODO : Veri farklı
+    public void soru27(){
         List<List<String>> data =getData("select * from employees \n" +
                 "left join dept_emp on dept_emp.emp_no=employees.emp_no\n" +
                 "left join dept_manager on dept_emp.dept_no=dept_manager.dept_no\n" +
-                "where dept_emp.dept_no='d005';");
+                "where dept_emp.dept_no='d005' limit 100;");
         for (List<String> row : data){
             System.out.println(row);
         }
@@ -106,7 +105,7 @@ public class Ummuhan extends DataBaseHelper {
         List<List<String>> data =getData("select employees.first_name, employees.last_name, salaries.salary\n" +
                 "from employees\n" +
                 "left join salaries on employees.emp_no=salaries.emp_no\n" +
-                "where employees.hire_date>'1990-02-20' and salaries.salary>50000;");
+                "where employees.hire_date>'1990-02-20' and salaries.salary>50000 limit 100;");
         for (List<String> row : data){
             System.out.println(row);
         }
