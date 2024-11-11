@@ -118,14 +118,13 @@ public class Merve extends DataBaseHelper {
     }
 
     public void soru20() {
-        //TODO: SORULACAK!
         List<List<String>> data = getData("select employees.first_name,employees.last_name,employees.hire_date,salaries.salary\n" +
                 "from employees\n" +
                 "left join salaries on employees.emp_no = salaries.emp_no\n" +
                 "left join dept_emp on employees.emp_no = dept_emp.emp_no\n" +
                 "left join departments on dept_emp.dept_no = departments.dept_no\n" +
                 "where departments.dept_no='d007' and employees.hire_date between '1985-01-01' and '1989-12-31'\n" +
-                "order by salaries.salary desc;"
+                "order by salaries.salary desc limit 100;"
         );
         for (List<String> row : data) {
             System.out.println(row);
