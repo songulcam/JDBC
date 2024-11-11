@@ -62,7 +62,7 @@ public class Ummuhan extends DataBaseHelper {
         }
     }
 
-    public void soru24(){
+    public void soru24(){ //TODO : Veri farklı
         List<List<String>> data =getData("select employees.first_name, employees.last_name, employees.hire_date\n" +
                 "from employees\n" +
                 "where employees.hire_date between '1990-02-20' and '1995-02-20';");
@@ -112,7 +112,7 @@ public class Ummuhan extends DataBaseHelper {
         }
     }
 
-    public void soru29(){
+    public void soru29(){ //TODO : Veri farklı
         List<List<String>> data =getData("select employees.*, departments.dept_name, titles.title\n" +
                 "from employees\n" +
                 "left join  dept_emp on employees.emp_no=dept_emp.emp_no \n" +

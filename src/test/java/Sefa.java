@@ -4,8 +4,6 @@ import utilities.DataBaseHelper;
 import java.util.List;
 
 public class Sefa extends DataBaseHelper {
-
-
     public static void main(String[] args) {
         List<List<String>> data =getData("select * from employees\n" +
                 "left join salaries on employees.emp_no = salaries.emp_no\n" +
