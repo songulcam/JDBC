@@ -3,7 +3,10 @@ import utilities.DataBaseHelper;
 import java.util.List;
 public class Songul extends DataBaseHelper {
     public static void main(String[] args) {
-
+        List<List<String>> data =getData("select *  from employees order by birth_date limit 100;");
+        for (List<String> row : data){
+            System.out.println(row);
+        }
     }
     public void Soru31(){
         List<List<String>> data =getData("select employees.emp_no,employees.first_name,employees.last_name,max(salaries.salary)\n" +
@@ -42,24 +45,23 @@ public class Songul extends DataBaseHelper {
         }
     }
     public void Soru35(){
-        List<List<String>> data =getData("select dept_manager.emp_no,dept_manager.dept_no,dept_manager.from_date,dept_manager.to_date\n" +
-                "from dept_manager\n" +
-                "where emp_no=110022;");
+        List<List<String>> data =getData("select employees.first_name,employees.last_name,(year(current_date())-(year(employees.hire_date))) as EmpHireDate\n" +
+                "from employees;");
         for (List<String> row : data){
             System.out.println(row);
         }
     }
-    public void Soru36(){ //TODO
+    public void Soru36(){
         List<List<String>> data = getData("select employees.first_name,employees.last_name,(year(current_date())-(year(employees.hire_date))) as EmpHireDate\n" +
-                "from employees;");
+                "from employees limit 50;");
         for (List<String> row : data) {
             System.out.println(row);
         }
     }
-    public void Soru37(){ //TODO
+    public void Soru37(){
         List<List<String>> data =getData("select titles.emp_no, max(titles.title)\n" +
                 "from titles\n" +
-                "group by emp_no;");
+                "group by emp_no limit 10;");
         for (List<String> row : data){
             System.out.println(row);
         }
@@ -75,13 +77,13 @@ public class Songul extends DataBaseHelper {
         }
 
     }
-    public void Soru39(){ //TODO
-        List<List<String>> data =getData("select *  from employees order by birth_date;");
+    public void Soru39(){
+        List<List<String>> data =getData("select *  from employees order by birth_date limit 100;");
         for (List<String> row : data){
             System.out.println(row);
         }
     }
-    public void Soru40(){//TODO
+    public void Soru40(){
         List<List<String>> data =getData("select * from employees\n" +
                 "where hire_date between '1992-04-01' and '1992-04-30';");
         for (List<String> row : data){
