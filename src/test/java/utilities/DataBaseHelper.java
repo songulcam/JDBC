@@ -1,5 +1,8 @@
 package utilities;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +33,18 @@ public class DataBaseHelper {
         }
         DbConnectionClose();
         return getData;
+    }
+
+    public static void bufferWriter(String path , String Sql){
+        List<List<String>> data = getData(Sql);
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(path))) {
+            for (List<String> row : data) {
+                writer.write(String.join(" - ", row));
+                writer.newLine();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public static void DbConnectionOpen() {
