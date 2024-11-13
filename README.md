@@ -44,256 +44,401 @@ This README file contains various SQL queries for a sample `employees` schema. T
 
 ![employees-schema.png](src/main/resources/img/employees-schema.png)
 
-## 1. List all employees in department D001.
-select * from dept_manager where dept_no='d001';
+## Contributors
 
-## 2. List all employees in 'Human Resources' department.
-select * from dept_manager where dept_no='d003';
+  
+| Contributor                                               | Role                                  |
+|-----------------------------------------------------------|---------------------------------------|
+| [Sefa Kahraman](https://github.com/SefaKahramann)         | Project Lead & QA Automation Engineer |
+| [Ümmühan Teke](https://github.com/UmmuhanTeke)            | QA Automation Engineer                |
+| [Merve Kaya](https://github.com/kayyamervee)              | QA Automation Engineer                |
+| [Songül Çam](https://github.com/songulcam)                | QA Automation Engineer                |
 
-## 3. Calculate the average salary of all employees
-select * from salaries;
-select avg(salary) as Salary from salaries;
+###	1. List all employees in department D001
+```SQL
+SELECT *
+FROM employees
+INNER JOIN dept_emp ON employees.emp_no = dept_emp.emp_no
+WHERE dept_no = 'D001';
+```
 
-## 4. Calculate the average salary of all employees with gender "M"
-select avg(salary)
-from salaries
-left join employees on salaries.emp_no = employees.emp_no
-where employees.gender='M';
+###	2. List all employees in 'Human Resources' department
+```SQL
+SELECT employees.*
+FROM employees
+INNER JOIN dept_emp ON employees.emp_no = dept_emp.emp_no
+INNER JOIN departments ON dept_emp.dept_no = departments.dept_no
+WHERE departments.dept_name = 'Human Resources';
+```
 
-## 5. Calculate the average salary of all employees with gender "F"
-select avg(salary)
-from salaries
-left join employees on salaries.emp_no=employees.emp_no
-where employees.gender='F'; 
+###	3. Calculate the average salary of all employees
+```SQL
+SELECT AVG(salary) AS average_salary
+FROM salaries;
+```
 
-## 6. List all employees in the "Sales" department with a salary greater than 70,000.
-select employees.first_name, employees.last_name, salaries.salary
-from employees
-left join salaries on salaries.emp_no=employees.emp_no
-left join dept_emp on dept_emp.emp_no=employees.emp_no
-left join departments on departments.dept_no=dept_emp.dept_no
-where departments.dept_no='d007'and salaries.salary>70000;
+###	4. Calculate the average salary of all employees with gender "M"
+```SQL
+SELECT AVG(s.salary) AS average_salary
+FROM employees e
+INNER JOIN salaries s ON e.emp_no = s.emp_no
+WHERE e.gender = 'F';
+```
 
-## 7. This query retrieves employees who have salaries between 50000 and 100000.
-select employees.first_name, employees.last_name, salaries.salary
-from employees
-left join salaries on salaries.emp_no=employees.emp_no
-where salaries.salary between 50000 and 100000;
+###	5. Calculate the average salary of all employees with gender "F"
+```SQL
+SELECT AVG(s.salary) AS average_salary
+FROM employees e
+INNER JOIN salaries s ON e.emp_no = s.emp_no
+WHERE e.gender = 'M';
+```
 
-## 8. Calculate the average salary for each department (by department number or department name)
-select departments.dept_no, departments.dept_name, avg(salary)
-from departments
-left join dept_emp on dept_emp.dept_no=departments.dept_no
-left join salaries on salaries.emp_no=dept_emp.emp_no
-group by departments.dept_no, departments.dept_name;
+###	6: List all employees in the "Sales" department with a salary greater than 70,000
+```SQL
+SELECT e.*, s.salary
+FROM employees e
+JOIN dept_emp de ON e.emp_no = de.emp_no
+JOIN departments d ON de.dept_no = d.dept_no
+JOIN salaries s ON e.emp_no = s.emp_no
+WHERE d.dept_name = 'Sales' AND s.salary > 70000;
+```
 
-## 9. Calculate the average salary for each department, including department names
-select departments.dept_no, departments.dept_name, avg(salary)
-from departments
-left join dept_emp on dept_emp.dept_no=departments.dept_no
-left join salaries on salaries.emp_no=dept_emp.emp_no
-group by departments.dept_no, departments.dept_name;
+###	7. This query retrieves employees who have salaries between 50000 and 100000
+```SQL
+SELECT e.*
+FROM employees e
+INNER JOIN salaries s ON e.emp_no = s.emp_no
+WHERE s.salary BETWEEN 50000 AND 100000;
+```
 
-## 10. Find all salary changes for employee with emp. no '10102'
-select * from salaries where emp_no='10102';
+###	8. Calculate the average salary for each department (by department number or department name)
+* ### by department no:
+ ```SQL
+SELECT de.dept_no, AVG(s.salary) AS average_salary
+FROM dept_emp de
+JOIN salaries s ON de.emp_no = s.emp_no
+GROUP BY de.dept_no;
+```
 
-## 11. Find the salary increases for employee with employee number '10102' (using the to_date column
-in salaries)
-select * from salaries where emp_no='10102' order by salary;
+* ### by department name:
+ ```SQL
+SELECT dept_name, AVG(salary) AS avg_salary
+FROM departments
+JOIN dept_emp ON departments.dept_no = dept_emp.dept_no
+JOIN salaries ON dept_emp.emp_no = salaries.emp_no
+GROUP BY departments.dept_no;
+```
 
-## 12. Find the employee with the highest salary
-select employees.first_name, employees.last_name, salaries.salary
-from employees
-left join salaries on employees.emp_no=salaries.emp_no 
-order by salary desc limit 1;
+###	9. Calculate the average salary for each department, including department names
+```SQL
+SELECT d.dept_no, d.dept_name, AVG(s.salary) AS average_salary
+FROM employees e
+JOIN dept_emp de ON e.emp_no = de.emp_no
+JOIN salaries s ON e.emp_no = s.emp_no
+JOIN departments d ON de.dept_no = d.dept_no
+GROUP BY d.dept_no, d.dept_name;
+```
 
-## 13. Find the latest salaries for each employee
-select salaries.emp_no, max(salary) from salaries group by emp_no;
+###	10. Find all salary changes for employee with emp. no '10102'
+```SQL
+SELECT emp_no, salary, from_date, to_date
+FROM salaries
+WHERE emp_no = '10102'
+ORDER BY from_date;
+```
 
-## 14. List the first name, last name, and highest salary of employees in the "Sales" department.
-Order the list by highest salary descending and only show the employee with the highest salary.
-select employees.first_name, employees.last_name, max(salary) as maxSalary
-from employees
-left join dept_emp on employees.emp_no=dept_emp.emp_no
-left join departments on dept_emp.dept_no=departments.dept_no
-left join salaries on dept_emp.emp_no=salaries.emp_no
-where departments.dept_no='d007'
-group by employees.emp_no, employees.first_name, employees.last_name
-order by maxSalary desc limit 1;
+###	11. Find the salary increases for employee with employee number '10102' (using the to_date column in salaries)
+```SQL
+SELECT emp_no, salary, to_date
+FROM salaries
+WHERE emp_no = '10102'
+ORDER BY to_date;
+```
 
+###	12. Find the employee with the highest salary
+```SQL
+SELECT * FROM employees
+JOIN salaries ON employees.emp_no = salaries.emp_no
+ORDER BY salary DESC
+LIMIT 1;
+```
 
-## 15. Find the Employee with the Highest Salary Average in the Research Department
-select employees.first_name, employees.last_name, avg(salaries.salary) as average  
-from employees
-left join dept_emp on employees.emp_no=dept_emp.emp_no
-left join departments on dept_emp.dept_no=departments.dept_no
-left join salaries on dept_emp.emp_no=salaries.emp_no
-where departments.dept_no='d008'
-group by employees.emp_no, employees.first_name, employees.last_name
-order by average desc limit 1;
+###	13. Find the latest salaries for each employee
+```SQL
+SELECT emp_no, salary, to_date
+FROM salaries
+WHERE (emp_no, to_date) IN (SELECT emp_no, MAX(to_date) FROM salaries GROUP BY emp_no);
+```
 
-## 16. For each department, identify the employee with the highest single salary ever recorded. List the
-department name, employee's first name, last name, and the peak salary amount. Order the results
-by the peak salary in descending order.
+###	14. List the first name, last name, and highest salary of employees in the "Sales" department.Order the list by highest salary descending and only show the employee with the highest salary.
+```SQL
+SELECT e.first_name, e.last_name, MAX(s.salary) AS highest_salary
+FROM employees e
+INNER JOIN dept_emp de ON e.emp_no = de.emp_no
+INNER JOIN departments d ON de.dept_no = d.dept_no
+INNER JOIN salaries s ON e.emp_no = s.emp_no
+WHERE d.dept_name = 'Sales'
+GROUP BY e.first_name, e.last_name
+ORDER BY highest_salary DESC
+LIMIT 1;
+```
 
+### 15. Find the Employee with the Highest Salary Average in the Research Department
+```SQL
+SELECT e.first_name, e.last_name, MAX(s.salary) AS max_salary
+FROM employees e
+INNER JOIN dept_emp de ON e.emp_no = de.emp_no
+INNER JOIN departments d ON de.dept_no = d.dept_no
+INNER JOIN salaries s ON e.emp_no = s.emp_no
+WHERE d.dept_name = 'Research'
+GROUP BY e.first_name, e.last_name
+ORDER BY max_salary DESC
+LIMIT 1;
+```
 
-## 17. Identify the employees in each department who have the highest average salary. List the
-department name, employee's first name, last name, and the average salary. Order the results by
-average salary in descending order, showing only those with the highest average salary within their
-department.
+###	16. For each department, identify the employee with the highest single salary ever recorded.List the department name, employee's first name, last name, and the peak salary amount.Order the results by the peak salary in descending order.
+```SQL
+SELECT d.dept_name AS department, e.first_name, e.last_name, MAX(s.salary) AS max_salary
+FROM employees e
+INNER JOIN dept_emp de ON e.emp_no = de.emp_no
+INNER JOIN departments d ON de.dept_no = d.dept_no
+INNER JOIN salaries s ON e.emp_no = s.emp_no
+GROUP BY d.dept_name
+ORDER BY max_salary DESC;
+```
 
+###	17. Identify the employees in each department who have the highest average salary.List the department name, employee's first name, last name, and the average salary.	Order the results by average salary in descending order, showing only those with the highest average salary within their department.
+```SQL
+SELECT d.dept_name AS department, e.first_name, e.last_name, AVG(s.salary) AS avg_salary
+FROM employees e
+INNER JOIN dept_emp de ON e.emp_no = de.emp_no
+INNER JOIN departments d ON de.dept_no = d.dept_no
+INNER JOIN salaries s ON e.emp_no = s.emp_no
+GROUP BY department
+ORDER BY avg_salary DESC;
+```
 
-## 18. List the names, last names, and hire dates in alphabetical order of all employees hired before
-January 01, 1990.
-select employees.first_name, employees.last_name, employees.hire_date
-from employees
-where employees.hire_date < '1990-01-01'
-order by employees.first_name, employees.last_name;
+###	18. List the names, last names, and hire dates in alphabetical order of all employees hired before January 01, 1990
+```SQL
+SELECT first_name, last_name, hire_date
+FROM employees
+WHERE hire_date < '1990-01-01'
+ORDER BY first_name ASC, last_name ASC;
+```
 
+###	19. List the names, last names, hire dates of all employees hired	between January 01, 1985 and December 31, 1989, sorted by hire date
+```SQL
+SELECT first_name, last_name, hire_date
+FROM employees
+WHERE hire_date BETWEEN '1985-01-01' AND '1989-12-31'
+ORDER BY hire_date ASC;
+```
 
-## 19. List the names, last names, hire dates of all employees hired between January 01, 1985 and
-December 31, 1989, sorted by hire date.
-select employees.first_name, employees.last_name, employees.hire_date
-from employees
-where employees.hire_date between '1985-01-01' and '1989-12-31'
-order by employees.hire_date;
+###	20. List the names, last names, hire dates, and salaries of all employees	in the Sales department who were hired between January 01, 1985 and December 31, 1989, sorted by salary in descending order
+```SQL
+SELECT first_name, last_name, hire_date, salary
+FROM employees
+WHERE hire_date BETWEEN '1985-01-01' AND '1989-12-31'
+AND department = 'Sales'
+AND emp_no IN (SELECT emp_no FROM salaries)
+ORDER BY salary DESC;
+```
 
-## 20. List the names, last names, hire dates, and salaries of all employees in the Sales department who
-were hired between January 01, 1985 and December 31, 1989, sorted by salary in descending order.
-select employees.first_name, employees.last_name, employees.hire_date, salaries.salary
-from employees
-left join salaries on employees.emp_no=salaries.emp_no
-left join dept_emp on salaries.emp_no=dept_emp.emp_no
-left join departments on dept_emp.dept_no=departments.dept_no
-where departments.dept_no='d007' and employees.hire_date between '1985-01-01' and '1989-12-31'
-order by salaries.salary desc;
+###	21.
+*   ###   a: Find the count of male employees (`179973`)
+```SQL
+SELECT COUNT(gender) AS Male_Count FROM employees WHERE gender = 'M';
+```
+*   ###   b: Determine the count of female employees (`120050`)
+```SQL
+SELECT COUNT(gender) AS Female_Count FROM employees WHERE gender = 'F';
+```
+*   ###   c: Find the number of male and female employees by grouping:
+```SQL
+SELECT gender, COUNT(*) AS count FROM employees GROUP BY gender;
+```
+*   ###   d: Calculate the total number of employees in the company (`300023`)
+```SQL
+SELECT COUNT(emp_no) AS Total_Employees FROM employees;
+```
 
-## 21.
--- a: Find the count of male employees (179973)
--- b: Determine the count of female employees (120050)
--- c: Find the number of male and female employees by grouping:
--- d: Calculate the total number of employees in the company (300023)
-select count(*) from employees where employees.gender='M';
-select count(*) from employees where employees.gender='F';
-select count(*) from employees group by employees.gender;
-select count(*) from employees;
+###	22.
+*   ###   a: Find out how many employees have unique first names (`1275`)
+```SQL
+SELECT COUNT(DISTINCT first_name) AS Unique_Names FROM employees;
+```
+*   ###   b: Identify the number of distinct department names (`9`)
+```SQL
+SELECT COUNT(DISTINCT dept_name) AS Unique_Departments FROM departments;
+```
 
-## 22.
--- a: Find out how many employees have unique first names (1275)
--- b: Identify the number of distinct department names (9)
-select count(distinct employees.first_name)
-from employees;
-select count(distinct departments.dept_name)
-from departments;
+###	23. List the number of employees in each department
+```SQL
+SELECT de.dept_no, COUNT(*) AS employee_count
+FROM dept_emp de
+GROUP BY de.dept_no;
+```
 
-## 23. List the number of employees in each department
-select departments.dept_name, count(dept_emp.emp_no)
-from departments
-left join dept_emp on departments.dept_no=dept_emp.dept_no
-group by departments.dept_name;
+###	24. List all employees hired within the last 5 years from February 20, 1990
+```SQL
+SELECT *
+FROM employees
+WHERE hire_date <= DATE_SUB('1990-02-20', INTERVAL 5 YEAR);
+```
 
+###	25. List the information (employee number, date of birth, first name, last name, gender, hire date) of the employee named "Annemarie Redmiles"
+```SQL
+SELECT *
+FROM employees
+WHERE first_name = 'Annemarie' AND last_name = 'Redmiles';
+```
 
-## 24. List all employees hired within the last 5 years from February 20, 1990
-select employees.first_name, employees.last_name, employees.hire_date
-from employees
-where employees.hire_date between '1990-02-20' and '1995-02-20';
+###	26.	List all information (employee number, date of birth, first name, last name, gender, hire date, salary, department, and title) for the employee named "Annemarie Redmiles".
+```SQL
+SELECT *
+FROM employees e
+INNER JOIN salaries s ON e.emp_no = s.emp_no
+INNER JOIN titles t ON e.emp_no = t.emp_no
+WHERE e.first_name = 'Annemarie' AND e.last_name = 'Redmiles';
+```
 
+###  27. List all employees and managers in the D005 department
+```SQL
+SELECT e.emp_no, e.first_name, e.last_name, e.birth_date, e.gender, e.hire_date, d.dept_name AS department_name, t.title, s.salary
+FROM employees e
+JOIN dept_manager dm ON e.emp_no = dm.emp_no
+JOIN departments d ON dm.dept_no = d.dept_no
+JOIN titles t ON e.emp_no = t.emp_no
+JOIN salaries s ON e.emp_no = s.emp_no
+WHERE d.dept_no = 'D005';
+```
 
-## 25. List the information (employee number, date of birth, first name, last name, gender, hire date) of
-the employee named "Annemarie Redmiles".
-select * from employees
-where employees.first_name='Annemarie' and employees.last_name='Redmiles';
+###	28. List all employees hired after '1994-02-24' and earning more than 50,000
+```SQL
+SELECT e.emp_no, e.first_name, e.last_name, e.birth_date, e.gender, e.hire_date, t.title, s.salary
+FROM employees e
+JOIN titles t ON e.emp_no = t.emp_no
+JOIN salaries s ON e.emp_no = s.emp_no
+WHERE e.hire_date > '1994-02-24' AND s.salary > 50000;
+```
 
+###	29. List all employees working in the "Sales" department with the title "Manager"
+```SQL
+SELECT e.emp_no, e.first_name, e.last_name, e.birth_date, e.gender, e.hire_date
+FROM employees e
+JOIN dept_manager dm ON e.emp_no = dm.emp_no
+JOIN departments d ON dm.dept_no = d.dept_no
+JOIN titles t ON e.emp_no = t.emp_no
+WHERE d.dept_name = 'Sales' AND t.title = 'Manager';
+```
 
-## 26. List all information (employee number, date of birth, first name, last name, gender, hire date,
-salary, department, and title) for the employee named "Annemarie Redmiles".
-select employees.*, salaries.salary, departments.dept_name, titles.title
-from employees
-left join salaries on employees.emp_no=salaries.emp_no
-left join  dept_emp on employees.emp_no=dept_emp.emp_no 
-left join departments on dept_emp.dept_no=departments.dept_no 
-left join titles on employees.emp_no=titles.emp_no 
-where employees.first_name='Annemarie' and  employees.last_name='Redmiles';
+###	30. Find the department where employee with '10102' has worked the longest
+```SQL
+SELECT employees.emp_no, departments.dept_name, DATEDIFF(MAX(dept_emp.to_date), MIN(dept_emp.from_date)) AS work_duration
+FROM employees
+JOIN dept_emp ON employees.emp_no = dept_emp.emp_no
+JOIN departments ON dept_emp.dept_no = departments.dept_no
+GROUP BY employees.emp_no
+ORDER BY work_duration DESC
+LIMIT 1;
+```
 
-## 27. List all employees and managers in the D005 department
-select * from employees 
-left join dept_emp on dept_emp.emp_no=employees.emp_no
-left join dept_manager on dept_emp.dept_no=dept_manager.dept_no
-where dept_emp.dept_no='d005';
+###	31. Find the highest paid employee in department D004
+```SQL
+SELECT employees.first_name, employees.last_name, MAX(salaries.salary) AS max_salary
+FROM employees
+JOIN salaries ON employees.emp_no = salaries.emp_no
+JOIN dept_emp ON employees.emp_no = dept_emp.emp_no
+WHERE dept_emp.dept_no = 'D004';
+```
 
-## 28. List all employees hired after '1994-02-24' and earning more than 50,000
-select employees.first_name, employees.last_name, salaries.salary
-from employees
-left join salaries on employees.emp_no=salaries.emp_no
-where employees.hire_date>'1990-02-20' and salaries.salary>50000;
+###	32. Find the entire position history for employee with emp. no '10102'
+```SQL
+SELECT emp_no, title, from_date, to_date
+FROM titles
+WHERE emp_no = '10102'
+ORDER BY from_date;
+```
 
-## 29. List all employees working in the "Sales" department with the title "Manager"
-select employees.*, departments.dept_name, titles.title
-from employees
-left join  dept_emp on employees.emp_no=dept_emp.emp_no 
-left join departments on dept_emp.dept_no=departments.dept_no 
-left join titles on employees.emp_no=titles.emp_no 
-where departments.dept_name='Sales' and titles.title='Manager';
+###	33. Finding the average "employee age"
+```SQL
+SELECT AVG(DATEDIFF(CURRENT_DATE, birth_date) / 365) AS avg_age FROM employees;
+```
 
-## 30. Find the department where employee with '10102' has worked the longest
-select dept_emp.dept_no,departments.dept_name, (year(current_date())-year(dept_emp.from_date)) as maxTimeTable
-from dept_emp
-left join departments on departments.dept_no = dept_emp.dept_no
-where dept_emp.emp_no='10102'
-group by dept_emp.dept_no
-order by maxTimeTable desc;
+###	34. Finding the number of employees per department
+```SQL
+SELECT dept_no, COUNT(*) AS employee_count
+FROM dept_emp
+GROUP BY dept_no;
+```
 
-## 31. Find the highest paid employee in department D004
-select employees.first_name, employees.last_name, departments.dept_no, max(salaries.salary)
-from employees
-left join dept_emp on employees.emp_no=dept_emp.emp_no
-left join salaries on employees.emp_no=salaries.emp_no
-left join departments on dept_emp.dept_no=departments.dept_no
-where departments.dept_no='d004'
-group by employees.emp_no, employees.first_name, employees.last_name
-order by max(salaries.salary) desc limit 1;
+###	35. Finding the managerial history of employee with ID (emp. no) 110022
+```SQL
+SELECT employees.first_name, employees.last_name, dept_manager.from_date, dept_manager.to_date
+FROM employees
+JOIN dept_manager ON employees.emp_no = dept_manager.emp_no
+WHERE employees.emp_no = '110022';
+```
 
-## 32. Find the entire position history for employee with emp. no '10102'
- select  titles.title, titles.emp_no
- from titles 
- where titles.emp_no='10102';
+###	36. Find the duration of employment for each employee
+```SQL
+SELECT emp_no, DATEDIFF(MAX(to_date), MIN(from_date)) AS work_duration
+FROM titles
+GROUP BY emp_no;
+```
 
-## 33. Finding the average "employee age"
-select (year(current_date())-(avg(year(birth_date)))) as AvgAge from employees;
+###	37. Find the latest title information for each employee
+```SQL
+SELECT employees.emp_no, employees.first_name, employees.last_name, titles.title
+FROM employees
+JOIN titles ON employees.emp_no = titles.emp_no
+WHERE titles.to_date = (SELECT MAX(to_date) FROM titles WHERE titles.emp_no = employees.emp_no);
+```
 
-## 34. Finding the number of employees per department
- select dept_no, COUNT(*) 
-from dept_emp
-group by dept_no;
+###	38. Find the first and last names of managers in department 'D005'
+```SQL
+SELECT employees.first_name, employees.last_name
+FROM employees
+JOIN dept_manager ON employees.emp_no = dept_manager.emp_no
+WHERE dept_manager.dept_no = 'D005';
+```
 
-## 35. Finding the managerial history of employee with ID (emp. no) 110022
-select dept_manager.emp_no,dept_manager.dept_no,dept_manager.from_date,dept_manager.to_date
-from dept_manager
-where emp_no=110022;
+###	39. Sort employees by their birth dates
+```SQL
+SELECT *  FROM employees ORDER BY birth_date;
+```
 
-## 36. Find the duration of employment for each employee
-select employees.first_name, employees.last_name, (year(current_date())) - (year(hire_date)) as EmpHireDate from employees;
+###	40. List employees hired in April 1992
+```SQL
+SELECT * FROM employees
+WHERE hire_date BETWEEN '1992-04-01' AND '1992-04-30';
+```
 
-## 37. Find the latest title information for each employee
-select titles.emp_no, max(titles.title)
-from titles
-group by emp_no;
+###	41. Find all departments that employee '10102' has worked in
+```SQL
+SELECT DISTINCT dept_no
+FROM dept_emp
+WHERE emp_no = '10102';
+```
 
-## 38. Find the first and last names of managers in department 'D005'
-select employees.first_name, employees.last_name
-from employees
-left join dept_manager on employees.emp_no = dept_manager.emp_no
-where dept_manager.dept_no ='d005';
+# Project Structure:
+```bash
+SQLProject
+│   pom.xml
+│   Readme.md
+├───src
+│   ├───main
+│   │   ├───java
+│   │   └───resources
+│   │       │   BaseQueries.sql
+│   │       │   TaskAnswers.sql
+│   │       │
+│   │       └───img
+│   │               employees-schema.png
+│   └───test
+│       └───java
+│               DatabaseHelper.java
+│               Queries.java
+│               SampleJDBC.java
 
-## 39. Sort employees by their birth dates
-select *  from employees order by birth_date;
-
-## 40. List employees hired in April 1992
-select * from employees
-where hire_date between '1992-04-01' and '1992-04-30';
-
-## 41. Find all departments that employee '10102' has worked in.
-select departments.dept_name
-from dept_emp
-inner join departments on departments.dept_no=dept_emp.dept_no
-where dept_emp.emp_no='10102';
+```
